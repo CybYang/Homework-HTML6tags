@@ -1,0 +1,410 @@
+#ai-chat-box {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 400px;
+    height: 500px;
+    border: 1px solid #ccc;
+    background: white;
+    display: none;
+    padding: 0;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    flex-direction: column;
+    min-width: 300px;
+    min-height: 200px;
+    box-sizing: border-box;
+    /* 新增拖动所需属性 */
+    cursor: default;
+    user-select: none;
+}
+
+#ai-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+    background: #f8f9fa;
+}
+
+#close-btn {
+    position: relative;
+    z-index: 25; /* 确保关闭按钮在拖拽层上方 */
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: #ff5f57;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+    line-height: 1;
+    transition: background 0.2s;
+}
+
+#close-btn:hover {
+    background: #ff3b30;
+}
+
+#ai-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    overflow: hidden;
+}
+
+#ai-quote {
+    background: #f8f9fa;
+    border-left: 3px solid #4a90e2;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    color: #666;
+    font-size: 0.9em;
+    display: none; /* 默认隐藏 */
+}
+
+#ai-input::placeholder {
+    color: #999;
+    font-style: italic;
+}
+
+#ai-history {
+    flex: 1;
+    overflow-y: auto;
+    background: #f9f9f9;
+    border-radius: 5px;
+    margin: 10px 0;
+    padding: 10px;
+    min-height: 100px;
+}
+
+/* 新增历史面板样式 */
+.history-panel {
+    right: 20px;
+    bottom: 70px;
+    width: 300px;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    display: none;
+    z-index: 1000;
+    padding: 15px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.history-panel.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.history-toggle {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 5px;
+    margin-left: 10px;
+}
+
+/* 添加淡入动画 */
+
+
+/* 历史项样式 */
+.history-item {
+    padding: 10px;
+    margin: 8px 0;
+    background: #f8f9fa;
+    border-radius: 6px;
+    animation: fadeIn 0.3s ease;
+}
+
+.history-question {
+    color: #007bff;
+    font-weight: 500;
+}
+
+.history-answer {
+    color: #28a745;
+    margin-top: 5px;
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid #eee;
+}
+
+#search-input {
+    flex: 1;
+    margin: 0 10px;
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-width: 120px;
+}
+
+.ai-quote {
+    background: #f4f4f4;
+    padding: 8px;
+    border-left: 4px solid #007bff;
+    margin-bottom: 10px;
+}
+
+#ai-recommend {
+    margin-bottom: 15px;
+}
+
+.recommend-question {
+    padding: 6px 12px;
+    margin: 4px 0;
+    cursor: pointer;
+    color: #007bff;
+    transition: background 0.2s;
+    border-radius: 4px;
+}
+
+.recommend-question:hover {
+    background: #e9ecef;
+}
+
+#ai-input-container {
+    display: flex;
+    gap: 8px;
+    padding: 0 15px 15px;
+}
+
+#ai-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    font-size: 14px;
+}
+
+#ai-send-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#ai-send-btn:hover {
+    background: #0056b3;
+}
+
+
+#ai-response {
+    display: block; /* 默认显示 */
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out; /* 平滑过渡 */
+}
+
+#ai-response.hidden {
+    opacity: 0;
+    pointer-events: none; /* 防止交互干扰 */
+}
+
+/* 调整手柄样式 */
+.resize-handle {
+    position: absolute;
+    background: transparent;
+    z-index: 20;
+}
+.resize-handle[data-direction="left"] {
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    cursor: ew-resize;
+}
+.resize-handle[data-direction="right"] {
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    cursor: ew-resize;
+}
+.resize-handle[data-direction="top"] {
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    cursor: ns-resize;
+}
+.resize-handle[data-direction="bottom"] {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    cursor: ns-resize;
+}
+.resize-handle[data-direction="top-left"] {
+    top: 0;
+    left: 0;
+    width: 10px;
+    height: 10px;
+    cursor: nwse-resize;
+}
+.resize-handle[data-direction="top-right"] {
+    top: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    cursor: nesw-resize;
+}
+.resize-handle[data-direction="bottom-left"] {
+    bottom: 0;
+    left: 0;
+    width: 10px;
+    height: 10px;
+    cursor: nesw-resize;
+}
+.resize-handle[data-direction="bottom-right"] {
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    cursor: nwse-resize;
+}
+/* 新增滚动容器 */
+#scroll-container {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;  /* Firefox */
+    padding: 0 15px 15px;
+    height: calc(100% - 120px); /* 固定高度计算 */
+}
+
+/* 自定义滚动条样式 */
+#scroll-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+#scroll-container::-webkit-scrollbar-track {
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+#scroll-container::-webkit-scrollbar-thumb {
+    background: #ced4da;
+    border-radius: 4px;
+}
+
+#scroll-container::-webkit-scrollbar-thumb:hover {
+    background: #adb5bd;
+}
+
+
+/* 新增拖拽区域样式（顶部） */ 
+.drag-handle {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 40px;/* 包含标题栏高度 */
+    cursor: move;
+    pointer-events: auto !important; 
+    z-index: 10;
+}
+/* 调整原有手柄层级 */
+.resize-handle {
+    z-index: 20;
+}
+.history-item {
+    margin: 10px 0;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 6px;
+}
+
+.question {
+    color: #1a73e8;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 8px;
+    transition: color 0.2s;
+}
+
+.question:hover {
+    color: #1557b0;
+    text-decoration: underline;
+}
+
+.answer {
+    color: #34a853;
+    margin-left: 12px;
+    padding-left: 12px;
+    border-left: 3px solid #e8eaed;
+}
+
+/* 消息容器占据主要空间 */
+#message-container {
+    flex: 1;
+    overflow-y: auto;
+    position: relative;
+}
+
+#message-list {
+    /* 反转滚动方向 */
+    display: flex;
+    flex-direction: column-reverse;
+    min-height: 100%;
+}
+
+/* 输入框容器固定在底部 */
+#ai-input-container {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    padding: 15px;
+    border-top: 1px solid #eee;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+}
+
+/* 消息样式 */
+.message {
+    margin: 8px 0;
+    display: flex;
+}
+
+.message.user {
+    justify-content: flex-end;
+}
+
+.message.ai {
+    justify-content: flex-start;
+}
+
+.message-bubble {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    line-height: 1.4;
+}
+
+.message.user .message-bubble {
+    background: #007bff;
+    color: white;
+}
+
+.message.ai .message-bubble {
+    background: #f1f3f5;
+    color: #333;
+}
